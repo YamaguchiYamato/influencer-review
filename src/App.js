@@ -1,25 +1,48 @@
-import logo from './logo.svg';
+import react from 'react';
+import firebase from './.env';
+import { useEffect,useState } from 'react';
+import SignInScreen from './components/SignInScreen';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () =>
+{
+  const [state, setState] = useState({
+    loading: true,
+    user: null
+  });
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      setState({
+        loading: false,
+        user: user
+      });
+    });
+  }, [])
+
+  const logout = () =>
+  {
+    firebase.auth().signOut();
+  }
+
+  if (state.loading === true)
+  {
+    return (<div>loading</div>);
+  }
+  
+  else
+  {
+    return(
+    <div>
+      Username: {state.user && state.user.displayName}
+      <br />
+      {state.user ?
+        (<button onClick={logout()}>Logout</button>) :
+        (<SignInScreen />)
+      }
+      </div>
+    )
+  }
 }
 
 export default App;
